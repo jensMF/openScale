@@ -219,7 +219,7 @@ public class BluetoothBeurerBF105 extends BluetoothStandardWeightProfile {
                         }
                         if (value[2] == UDS_CP_RESP_VALUE_SUCCESS) {
                             Timber.d("Success user consent");
-                        } else if (value[2] == UDS_CP_RESP_USER_NOT_AUTHORIZED && !registerNewUser) {
+                        } else if (value[2] == UDS_CP_RESP_USER_NOT_AUTHORIZED && !registerNewUser) { // if a new user should be registered, this is not an error
                             Timber.e("Not authorized");
                         }
                         break;
@@ -294,7 +294,7 @@ public class BluetoothBeurerBF105 extends BluetoothStandardWeightProfile {
         scaleMeasurement.setMuscle(musclePercentage);
         Timber.d(String.format("muscle percentage: %f", musclePercentage));
 
-        float boneMass = Math.round(parser.getIntValue(BluetoothBytesParser.FORMAT_UINT16) * 0.0199 + 100) * 0.01f;
+        float boneMass = Math.round(parser.getIntValue(BluetoothBytesParser.FORMAT_UINT16) * 0.0203f + 95f) * 0.01f;
         Timber.d(String.format("boneMass: %f", boneMass));
         scaleMeasurement.setBone(boneMass);
 
