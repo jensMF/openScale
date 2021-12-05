@@ -198,6 +198,7 @@ public abstract class BluetoothStandardWeightProfile extends BluetoothCommunicat
             case REQUEST_MEASUREMENT:
                 if (registerNewUser) {
                     requestMeasurement();
+                    stopMachineState();
                     sendMessage(R.string.info_step_on_scale_for_reference, 0);
                 }
                 break;
@@ -283,6 +284,11 @@ public abstract class BluetoothStandardWeightProfile extends BluetoothCommunicat
                         Timber.d("UDS_CP_CONSENT: Success user consent");
                         resumeMachineState();
                     } else if (value[2] == UDS_CP_RESP_USER_NOT_AUTHORIZED) {
+                        if (registerNewUser) {
+                            Timber.e(
+                                    "UDS_CP_CONSENT: Error, we should never reach this point, when registerNewUser==true");
+                            break;
+                        }
                         Timber.e("UDS_CP_CONSENT: Not authorized");
                         enterScaleUserConsentUi(this.selectedUser.getId(), getUserScaleIndex(this.selectedUser.getId()));
                     }
