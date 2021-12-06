@@ -632,9 +632,9 @@ public abstract class BluetoothStandardWeightProfile extends BluetoothCommunicat
 
     protected void writeBirthday() {
         BluetoothBytesParser parser = new BluetoothBytesParser();
-        Calendar UserBirthday = dateToCalender(this.selectedUser.getBirthday());
+        Calendar userBirthday = dateToCalender(this.selectedUser.getBirthday());
         Timber.d(String.format("user Birthday: %tD ; %tD", userBirthday));
-        parser.setDateTime(UserBirthday);
+        parser.setDateTime(userBirthday);
         writeBytes(BluetoothGattUuid.SERVICE_USER_DATA, BluetoothGattUuid.CHARACTERISTIC_USER_DATE_OF_BIRTH,
                 Arrays.copyOfRange(parser.getValue(), 0, 4));
     }
