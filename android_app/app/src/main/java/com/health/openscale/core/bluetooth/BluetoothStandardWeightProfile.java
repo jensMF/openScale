@@ -17,8 +17,9 @@
  /*
  * Based on source-code by weliem/blessed-android
  */
-package com.health.openscale.core.bluetooth;
+ package com.health.openscale.core.bluetooth;
 
+import static com.welie.blessed.BluetoothBytesParser.FORMAT_UINT32;
 import static com.welie.blessed.BluetoothBytesParser.FORMAT_UINT16;
 import static com.welie.blessed.BluetoothBytesParser.FORMAT_UINT8;
 
@@ -203,6 +204,7 @@ public abstract class BluetoothStandardWeightProfile extends BluetoothCommunicat
                 if (registerNewUser) {
                     requestMeasurement();
                     sendMessage(R.string.info_step_on_scale_for_reference, 0);
+                    stopMachineState();
                 }
                 break;
             default:
@@ -253,7 +255,8 @@ public abstract class BluetoothStandardWeightProfile extends BluetoothCommunicat
         else if (characteristic.equals(BluetoothGattUuid.CHARACTERISTIC_USER_CONTROL_POINT)) {
             handleUserControlPointNotify(value);
         }
-        else if(characteristic.equals(BluetoothGattUuid.CHARACTERISTIC_CHANGE_INCREMENT)) {
+        else if (characteristic.equals(BluetoothGattUuid.CHARACTERISTIC_CHANGE_INCREMENT)) {
+            Timber.d(String.format("Notification from CHARACTERISTIC_CHANGE_INCREMENT, value: [%s]", byteInHex(value)));
             resumeMachineState();
         }
         else {
@@ -358,6 +361,7 @@ public abstract class BluetoothStandardWeightProfile extends BluetoothCommunicat
                     OpenScale.getInstance().updateScaleUser(selectedUser);
                 }
                 registerNewUser = false;
+                resumeMachineState();
             }
         }
 
@@ -660,7 +664,7 @@ public abstract class BluetoothStandardWeightProfile extends BluetoothCommunicat
 
     protected void setChangeIncrement() {
         BluetoothBytesParser parser = new BluetoothBytesParser();
-        parser.setIntValue(1, FORMAT_UINT8);
+        parser.setIntValue(1, FORMAT_UINT32);
         writeBytes(BluetoothGattUuid.SERVICE_USER_DATA, BluetoothGattUuid.CHARACTERISTIC_CHANGE_INCREMENT,
                 parser.getValue());
     }
