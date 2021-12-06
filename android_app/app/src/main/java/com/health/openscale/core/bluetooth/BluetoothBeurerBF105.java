@@ -128,6 +128,7 @@ public class BluetoothBeurerBF105 extends BluetoothStandardWeightProfile {
     protected void writeTargetWeight() {
         BluetoothBytesParser parser = new BluetoothBytesParser();
         int targetWeight = (int) this.selectedUser.getGoalWeight();
+        Timber.d(String.format("targetWeight: %s", targetWeight));
         parser.setIntValue(targetWeight, FORMAT_UINT16);
         writeBytes(SERVICE_BF105_CUSTOM, CHARACTERISTIC_TARGET_WEIGHT,
                 parser.getValue());

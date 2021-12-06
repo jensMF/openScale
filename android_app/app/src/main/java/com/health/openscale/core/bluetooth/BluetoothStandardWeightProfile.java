@@ -190,6 +190,9 @@ public abstract class BluetoothStandardWeightProfile extends BluetoothCommunicat
                 Timber.d("Select user on scale!");
                 setUser(this.selectedUser.getId());
                 stopMachineState();
+                setChangeIncrement(1);
+                // reading CHARACTERISTIC_CHANGE_INCREMENT to resume machine state
+                readBytes(BluetoothGattUuid.SERVICE_USER_DATA, BluetoothGattUuid.CHARACTERISTIC_CHANGE_INCREMENT);
                 break;
             case SET_SCALE_USER_DATA:
                 if (registerNewUser) {
@@ -204,7 +207,6 @@ public abstract class BluetoothStandardWeightProfile extends BluetoothCommunicat
                 if (registerNewUser) {
                     requestMeasurement();
                     sendMessage(R.string.info_step_on_scale_for_reference, 0);
-                    stopMachineState();
                 }
                 break;
             default:
@@ -220,7 +222,7 @@ public abstract class BluetoothStandardWeightProfile extends BluetoothCommunicat
         writeHeight();
         writeActivityLevel();
         writeInitials();
-        setChangeIncrement();
+        setChangeIncrement(1);
     }
 
     @Override
@@ -256,8 +258,15 @@ public abstract class BluetoothStandardWeightProfile extends BluetoothCommunicat
             handleUserControlPointNotify(value);
         }
         else if (characteristic.equals(BluetoothGattUuid.CHARACTERISTIC_CHANGE_INCREMENT)) {
-            Timber.d(String.format("Notification from CHARACTERISTIC_CHANGE_INCREMENT, value: [%s]", byteInHex(value)));
-            resumeMachineState();
+            int increment = parser.getIntValue(FORMAT_UINT32);
+            Timber.d(String.format("Notification from CHARACTERISTIC_CHANGE_INCREMENT, value: %s", increment));
+            switch (increment) {
+                case 1:
+                    resumeMachineState();
+                    break;
+                default:
+                    break;
+            }
         }
         else {
             Timber.d(String.format("Notification from unhandled characteristic: %s, value: [%s]",
@@ -286,7 +295,7 @@ public abstract class BluetoothStandardWeightProfile extends BluetoothCommunicat
                 case UDS_CP_CONSENT:
                     if (registerNewUser) {
                         Timber.d("UDS_CP_CONSENT: registerNewUser==true, value[2] == " + value[2]);
-                        resumeMachineState();
+                        //resumeMachineState();
                         break;
                     }
                     if (value[2] == UDS_CP_RESP_VALUE_SUCCESS) {
@@ -361,7 +370,6 @@ public abstract class BluetoothStandardWeightProfile extends BluetoothCommunicat
                     OpenScale.getInstance().updateScaleUser(selectedUser);
                 }
                 registerNewUser = false;
-                resumeMachineState();
             }
         }
 
@@ -625,9 +633,11 @@ public abstract class BluetoothStandardWeightProfile extends BluetoothCommunicat
 
     protected void writeBirthday() {
         BluetoothBytesParser parser = new BluetoothBytesParser();
-        parser.setDateTime(dateToCalender(this.selectedUser.getBirthday()));
+        Calendar UserBirthday = dateToCalender(this.selectedUser.getBirthday());
+        Timber.d(String.format("user Birthday: %tD ; %tD", userBirthday));
+        parser.setDateTime(UserBirthday);
         writeBytes(BluetoothGattUuid.SERVICE_USER_DATA, BluetoothGattUuid.CHARACTERISTIC_USER_DATE_OF_BIRTH,
-                Arrays.copyOfRange(parser.getValue(), 0, 3));
+                Arrays.copyOfRange(parser.getValue(), 0, 4));
     }
 
     protected Calendar dateToCalender(Date date) {
@@ -662,9 +672,10 @@ public abstract class BluetoothStandardWeightProfile extends BluetoothCommunicat
         Timber.d("Write user initials not implemented!");
     }
 
-    protected void setChangeIncrement() {
+    protected void setChangeIncrement(int i) {
         BluetoothBytesParser parser = new BluetoothBytesParser();
-        parser.setIntValue(1, FORMAT_UINT32);
+        Timber.d(String.format("Setting Change increment to %s", i));
+        parser.setIntValue(i, FORMAT_UINT32);
         writeBytes(BluetoothGattUuid.SERVICE_USER_DATA, BluetoothGattUuid.CHARACTERISTIC_CHANGE_INCREMENT,
                 parser.getValue());
     }
