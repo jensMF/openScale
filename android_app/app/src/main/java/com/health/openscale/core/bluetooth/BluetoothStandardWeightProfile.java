@@ -295,7 +295,6 @@ public abstract class BluetoothStandardWeightProfile extends BluetoothCommunicat
                 case UDS_CP_CONSENT:
                     if (registerNewUser) {
                         Timber.d("UDS_CP_CONSENT: registerNewUser==true, value[2] == " + value[2]);
-                        //resumeMachineState();
                         break;
                     }
                     if (value[2] == UDS_CP_RESP_VALUE_SUCCESS) {
