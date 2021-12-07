@@ -258,7 +258,7 @@ public abstract class BluetoothStandardWeightProfile extends BluetoothCommunicat
             handleUserControlPointNotify(value);
         }
         else if (characteristic.equals(BluetoothGattUuid.CHARACTERISTIC_CHANGE_INCREMENT)) {
-            //int increment = parser.getIntValue(FORMAT_UINT32);
+            int increment = parser.getIntValue(FORMAT_UINT32);
             Timber.d(String.format("Notification from CHARACTERISTIC_CHANGE_INCREMENT, value: %s", increment));
             resumeMachineState();
             /*switch (increment) {
