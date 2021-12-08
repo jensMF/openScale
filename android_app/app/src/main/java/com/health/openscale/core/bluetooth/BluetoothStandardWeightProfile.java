@@ -190,9 +190,9 @@ public abstract class BluetoothStandardWeightProfile extends BluetoothCommunicat
                 Timber.d("Select user on scale!");
                 setUser(this.selectedUser.getId());
                 stopMachineState();
-                setChangeIncrement(1);
+                //setChangeIncrement(1);
                 // reading CHARACTERISTIC_CHANGE_INCREMENT to resume machine state
-                readBytes(BluetoothGattUuid.SERVICE_USER_DATA, BluetoothGattUuid.CHARACTERISTIC_CHANGE_INCREMENT);
+                //readBytes(BluetoothGattUuid.SERVICE_USER_DATA, BluetoothGattUuid.CHARACTERISTIC_CHANGE_INCREMENT);
                 break;
             case SET_SCALE_USER_DATA:
                 if (registerNewUser) {
@@ -296,6 +296,7 @@ public abstract class BluetoothStandardWeightProfile extends BluetoothCommunicat
                 case UDS_CP_CONSENT:
                     if (registerNewUser) {
                         Timber.d("UDS_CP_CONSENT: registerNewUser==true, value[2] == " + value[2]);
+                        resumeMachineState();
                         break;
                     }
                     if (value[2] == UDS_CP_RESP_VALUE_SUCCESS) {
